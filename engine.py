@@ -408,6 +408,9 @@ def formulate_strategy(field: dict) -> str:
 # SELF-PERCEPTION LOGGING
 # ══════════════════════════════════════════════════════════════════════════════
 
+LOG_ROOM = "flux-engine"  # PLATO server maps domain→room; tiles land here
+
+
 def log_self_perception(
     client: PlatoClient,
     cycle: int,
@@ -419,6 +422,8 @@ def log_self_perception(
     """Log the engine's own state to PLATO as a tile.
 
     Returns the tile hash if successfully submitted.
+    Note: this PLATO server maps the `domain` parameter to room name,
+    so `room` in the submit body is advisory only.
     """
     answer_lines = [
         f"=== Flux Engine State — Cycle {cycle} ===",
@@ -434,8 +439,8 @@ def log_self_perception(
 
     try:
         result = client.submit(
-            room="flux-engine-log",
-            domain="flux-engine",
+            room=LOG_ROOM,
+            domain=LOG_ROOM,  # This PLATO server uses domain as room name
             question=f"Flux Engine self-perception, cycle {cycle}",
             answer="\n".join(answer_lines),
             agent=AGENT_NAME,
@@ -517,11 +522,11 @@ def main():
 
     client = PlatoClient(PLATO_URL)
 
-    # Create the flux-engine-log room by submitting the first tile
+    # Create the flux-engine room by submitting the first tile
     try:
         client.submit(
-            room="flux-engine-log",
-            domain="flux-engine",
+            room=LOG_ROOM,
+            domain=LOG_ROOM,  # PLATO uses domain as room name
             question="Flux Engine initialized",
             answer="Engine boot sequence complete. Perception loop starting.",
             agent=AGENT_NAME,
